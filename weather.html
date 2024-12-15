@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="/style.css">
+<body>
+    <header>
+        <h1>Agricultural support Webplatform</h1>
+        <p>Empowering farmers with technology</p>
+        </header>
+        <nav>
+            <a href="/index.html">Home</a>   
+            <a href="/weather.html">Weather Updates</a>
+            <a href="#crop">Crop Recommendations</a>
+            <a href="#market">Market Prices</a>
+        
+        </nav>
+    <div class="container">
+        <div class="header">
+          <h1>Weather in <span id="city">Loading...</span></h1>
+        </div>
+        <div class="card">
+          <div class="weather-icon" id="weather-icon">
+            <img src="" alt="Weather Icon" id="weather-image" style="height: 200px ; width: 200px;">
+            <h2 id="text-cond"></h2>
+          </div>
+          <div class="temperature" id="temperature">--°C</div>
+          <div class="info" id="weather-info">--°C / --°C • Sunset --:-- PM • 0% Rain</div>
+        </div>
+    
+        <div class="card spraying-time">
+          <h2>Spraying Time</h2>
+          <p>Best time to spray crops based on weather conditions</p>
+          <div class="spraying-conditions">
+            <div class="condition unfavourable id="real-cond">Now<br>Unfavourable</div>
+            <div class="condition unfavourable">6 PM<br>Unfavourable</div>
+            <div class="condition unfavourable">7 PM<br>Unfavourable</div>
+            <div class="condition moderate">9 PM<br>Moderate</div>
+            <div class="condition moderate">10 PM<br>Moderate</div>
+          </div>
+        </div>
+    
+        <div class="card next-days">
+          <h2>Next 6 Days</h2>
+          <div class="forecast">
+            <div class="forecast-day">
+              <p>Mon</p>
+              <p>29°C</p>
+            </div>
+            <div class="forecast-day">
+              <p>Tue</p>
+              <p>29°C</p>
+            </div>
+            <div class="forecast-day">
+              <p>Wed</p>
+              <p>29°C</p>
+            </div>
+            <div class="forecast-day">
+              <p>Thu</p>
+              <p>29°C</p>
+            </div>
+            <div class="forecast-day">
+              <p>Fri</p>
+              <p>29°C</p>
+            </div>
+          </div>
+        </div>
+      </div>
+</body>
+<script src="/java.js"></script>
+</html>

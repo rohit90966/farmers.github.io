@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Widget</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #e6f9e6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .weather-container {
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .weather-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px;
+      background-color: #d9f9ff;
+    }
+
+    .weather-info {
+      color: #333;
+    }
+
+    .weather-info h1 {
+      font-size: 64px;
+      margin: 0;
+    }
+
+    .weather-info h2 {
+      font-size: 24px;
+      margin: 5px 0;
+      color: #666;
+    }
+
+    .weather-info p {
+      margin: 5px 0;
+      font-size: 18px;
+    }
+
+    .sun-placeholder {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, #ffeb3b, #ffcc00);
+      position: relative;
+    }
+
+    .sun-placeholder::before {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255, 235, 59, 0.4);
+    }
+
+    .weather-section {
+      padding: 20px;
+    }
+
+    .spraying-time {
+      margin-top: 20px;
+    }
+
+    .spraying-time h3 {
+      font-size: 20px;
+      color: #333;
+    }
+
+    .time-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .time-box span {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 8px 15px;
+      border-radius: 20px;
+    }
+
+    .time-box span.moderate {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .time-box span.optimal {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .time-box span.unfavorable {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .next-forecast {
+      margin-top: 20px;
+    }
+
+    .next-forecast h3 {
+      font-size: 20px;
+      color: #333;
+    }
+
+    .forecast-days {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .forecast-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    .forecast-day span {
+      margin: 5px 0;
+    }
+
+    .forecast-day .icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, #ffeb3b, #ffcc00);
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-container">
+    <!-- Weather Header -->
+    <div class="weather-header">
+      <div class="weather-info">
+        <h2 id="location">Pune, 15 Dec</h2>
+        <h1 id="temperature">24°C</h1>
+        <p id="temperature-range">29°C / 13°C</p>
+        <p id="sunset">Sunset: 6:01 pm</p>
+        <p id="rain-chance">🌧️ 0%</p>
+      </div>
+      <div class="sun-placeholder" id="sun-placeholder"></div>
+    </div>
+
+    <!-- Spraying Time Section -->
+    <div class="weather-section spraying-time">
+      <h3>Spraying Time <span title="Best time to spray crops based on weather conditions">ℹ️</span></h3>
+      <div class="time-box">
+        <span>Now</span>
+        <span class="moderate">6 pm</span>
+        <span class="unfavorable">7 pm</span>
+        <span class="moderate">8 pm</span>
+        <span class="moderate">9 pm</span>
+        <span class="optimal">10 pm</span>
+      </div>
+    </div>
+
+    <!-- Next 6 Days Section -->
+    <div class="weather-section next-forecast">
+      <h3>Next 6 Days</h3>
+      <div class="forecast-days" id="forecast-days">
+        <!-- Forecast data will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Async function to fetch weather data
+    const apiKey = "a2485e185326d1f0ad4651550044c137";
+     const apikey2="c757bd3005f7cc9f2d35"; // Replace with your OpenWeatherMap API key
+    const city = "Pune";
+    const units = "metric"; // Celsius
+    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${units}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=18.5204&lon=73.8567&units=${units}&exclude=current,minutely,hourly&appid=${apikey2}`;
+
+    // Function to fetch current weather
+    async function fetchCurrentWeather() {
+      try {
+        const response = await fetch(currentWeatherUrl);
+        const data = await response.json();
+        // Update the weather information on the page
+        document.getElementById("location").textContent = `${data.name}, ${new Date().toLocaleDateString()}`;
+        document.getElementById("temperature").textContent = `${Math.round(data.main.temp)}°C`;
+        document.getElementById("temperature-range").textContent = `${Math.round(data.main.temp_max)}°C / ${Math.round(data.main.temp_min)}°C`;
+        document.getElementById("sunset").textContent = `Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`;
+        document.getElementById("rain-chance").textContent = `🌧️ ${data.clouds.all}%`;
+      } catch (error) {
+        console.log("Error fetching current weather data:", error);
+      }
+      if(data.weather[0].main=="Clouds"){
+        image.src="/clouds.png"
+        weathername.innerHTML="Clouds"
+     }
+     else if(data.weather[0].main=="Clear"){
+        image.src="/clear.png"
+         weathername.innerHTML="Clear Sky";
+     }
+     else if(data.weather[0].main=="Rain"){
+        image.src="/rain.png"
+         weathername.innerHTML="Rain Started";
+     }
+      else if(data.weather[0].main=="Drizzle"){
+        image.src="/drizzle.png"
+         weathername.innerHTML="Drizzle";
+     }
+     else if(data.weather[0].main=="Mist"){
+        image.src="/mist"
+         weathername.innerHTML="Mist";
+     }
+    }
+
+    // Function to fetch 6-day forecast
+    async function fetchForecast() {
+      try {
+        const response = await fetch(forecastUrl);
+        const data = await response.json();
+
+        // Check if the 'daily' data is available
+        if (data && data.daily && Array.isArray(data.daily)) {
+          const forecastDays = document.getElementById("forecast-days");
+
+          // Loop through the next 6 days
+          data.daily.slice(1, 7).forEach((day) => {
+            const dayElement = document.createElement("div");
+            dayElement.classList.add("forecast-day");
+
+            // Get the date of the day
+            const date = new Date(day.dt * 1000);
+            const dayName = date.toLocaleString("en-US", { weekday: "short" });
+
+            // Get the temperature for the day
+            const temperature = Math.round(day.temp.day);
+
+            // Create the forecast day element
+            dayElement.innerHTML = `
+              <span>${dayName}</span>
+              <div class="icon"></div>
+              <span>${temperature}°C</span>
+            `;
+
+            forecastDays.appendChild(dayElement);
+          });
+        } else {
+          console.error("Invalid data format for 6-day forecast:", data);
+        }
+      } catch (error) {
+        console.log("Error fetching 6-day forecast data:", error);
+      }
+    }
+
+    // Initialize weather data fetch
+    (async function() {
+      await fetchCurrentWeather();
+      await fetchForecast();
+    })();
+  </script>
+</body>
+</html>

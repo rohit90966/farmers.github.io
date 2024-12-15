@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #a8e063, #56ab2f); /* Gradient background */
+      color: #333;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 50px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      color: #4CAF50;
+    }
+    .weather-icon {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .weather-icon img {
+      width: 120px;
+      height: 120px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+    .temperature {
+      text-align: center;
+      font-size: 4rem;
+      color: #4CAF50;
+      margin: 10px 0;
+    }
+    .info {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #555;
+      margin-bottom: 30px;
+    }
+    .spraying-time, .next-days {
+      margin-bottom: 30px;
+    }
+    .card {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .spraying-conditions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .condition {
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 10px;
+      border-radius: 8px;
+      width: 120px;
+      color: #ffffff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .condition:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    .condition.unfavourable {
+      background-color: #f44336; /* Red */
+    }
+    .condition.moderate {
+      background-color: #FF9800; /* Orange */
+    }
+    .condition.optimal {
+      background-color: #4CAF50; /* Green */
+    }
+    .next-days .forecast {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .forecast-day {
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 10px;
+      width: 100px;
+      border-radius: 8px;
+      background: linear-gradient(to bottom, #d4fc79, #96e6a1);
+      color: #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .forecast-day:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Weather in <span id="city">Loading...</span></h1>
+    </div>
+    <div class="card">
+      <div class="weather-icon" id="weather-icon">
+        <img src="" alt="Weather Icon" id="weather-image">
+      </div>
+      <div class="temperature" id="temperature">--°C</div>
+      <div class="info" id="weather-info">--°C / --°C • Sunset --:-- PM • 0% Rain</div>
+    </div>
+
+    <div class="card spraying-time">
+      <h2>Spraying Time</h2>
+      <p>Best time to spray crops based on weather conditions</p>
+      <div class="spraying-conditions">
+        <div class="condition unfavourable">Now<br>Unfavourable</div>
+        <div class="condition unfavourable">6 PM<br>Unfavourable</div>
+        <div class="condition unfavourable">7 PM<br>Unfavourable</div>
+        <div class="condition moderate">9 PM<br>Moderate</div>
+        <div class="condition moderate">10 PM<br>Moderate</div>
+      </div>
+    </div>
+
+    <div class="card next-days">
+      <h2>Next 6 Days</h2>
+      <div class="forecast">
+        <div class="forecast-day">
+          <p>Mon</p>
+          <p>29°C</p>
+        </div>
+        <div class="forecast-day">
+          <p>Tue</p>
+          <p>29°C</p>
+        </div>
+        <div class="forecast-day">
+          <p>Wed</p>
+          <p>29°C</p>
+        </div>
+        <div class="forecast-day">
+          <p>Thu</p>
+          <p>29°C</p>
+        </div>
+        <div class="forecast-day">
+          <p>Fri</p>
+          <p>29°C</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function getWeather(latitude, longitude) {
+      const apiKey = "a2485e185326d1f0ad4651550044c137"; // Replace with your OpenWeatherMap API key
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch weather data");
+        const data = await response.json();
+
+        const cityName = data.name;
+        const temp = Math.round(data.main.temp);
+        const minTemp = Math.round(data.main.temp_min);
+        const maxTemp = Math.round(data.main.temp_max);
+        const sunsetTime = new Date(data.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const weatherCondition = data.weather[0].main;
+
+        // Update UI
+        document.getElementById("city").innerText = cityName;
+        document.getElementById("temperature").innerText = `${temp}°C`;
+        document.getElementById("weather-info").innerText = `${maxTemp}°C / ${minTemp}°C • Sunset ${sunsetTime} • 0% Rain`;
+
+        // Set weather icon based on condition
+        const weatherImage = document.getElementById("weather-image");
+        if (weatherCondition === "Clear") {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+        } else if (weatherCondition === "Clouds") {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/414/414825.png";
+        } else if (weatherCondition === "Rain") {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
+        } else if (weatherCondition === "Snow") {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/642/642102.png";
+        } else if (weatherCondition === "Thunderstorm") {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/1146/1146869.png";
+        } else {
+          weatherImage.src = "https://cdn-icons-png.flaticon.com/512/131/131043.png"; // Default icon
+        }
+      } catch (error) {
+        document.getElementById("city").innerText = "Unable to fetch city name";
+        console.error(error);
+      }
+    }
+
+    async function fetchLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            await getWeather(latitude, longitude);
+          },
+          () => {
+            document.getElementById("city").innerText = "Location access denied";
+          }
+        );
+      } else {
+        document.getElementById("city").innerText = "Geolocation not supported";
+      }
+    }
+
+    // Initialize app
+    fetchLocation();
+  </script>
+</body>
+</html>
